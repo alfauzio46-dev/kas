@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Pencatatan Iuran Kas</title>
+    <style>
+        body { font-family: Arial; margin:20px; }
+        input { padding:8px; margin-right:10px; }
+        button { padding:8px 12px; }
+        table { border-collapse: collapse; width: 100%; margin-top:20px; }
+        th, td { border:1px solid #ccc; padding:10px; text-align:left; }
+    </style>
+</head>
+<body>
+
+<h2 id="welcome"></h2>
+
+<div>
+    <label>Nominal Iuran (Rp):</label>
+    <input type="number" id="amount" placeholder="contoh: 5000">
+    <button onclick="addKas()">Catat Iuran</button>
+</div>
+
+<h3>Riwayat Iuran Anda</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Tanggal</th>
+            <th>Jumlah (Rp)</th>
+        </tr>
+    </thead>
+    <tbody id="kasTable"></tbody>
+</table>
+
+<script>
+const user = localStorage.getItem("loginUser");
+
+if (!user) {
+    alert("Anda belum login!");
+    window.location.href = "index.html";
+}
+
+document.getElementById("welcome").innerText = "Selamat datang, " + user + "!";
+
+// Ambil data kas dari localStorage
+let kasData = JSON.parse(localStorage.getItem("kas_" + user)) || [];
+
+function loadTable() {
+    const table = document.getElementById("kasTable");
+    table.innerHTML = "";
+
+    kasData.forEach(item => {
+        const row = `<tr>
+            <td>${item.date}</td>
+            <td>${item.amount}</td>
+        </tr>`;
+        table.innerHTML += row;
+    });
+}
+
+function addKas() {
+    const amount = document.getElementById("amount").value;
+
+    if (amount === "") {
+        alert("Nominal harus diisi!");
+        return;
+    }
+
+    const entry = {
+        date: new Date().toLocaleString("id-ID"),
+        amount: amount
+    };
+
+    kasData.push(entry);
+
+    localStorage.setItem("kas_" + user, JSON.stringify(kasData));
+    document.getElementById("amount").value = "";
+    loadTable();
+}
+
+loadTable();
+</script>
+
+</body>
+</html>
